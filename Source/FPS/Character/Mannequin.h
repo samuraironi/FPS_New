@@ -27,10 +27,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-		TSubclassOf<class AGun> GunBlueprint;
+	TSubclassOf<class AGun> GunBlueprint;
 	
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		void Fire();
+	void PullTrigger();
 
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
