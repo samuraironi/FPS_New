@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Engine/World.h"
 #include "Tile.h"
 
 
@@ -11,14 +12,18 @@ ATile::ATile()
 
 }
 
-void ATile::PlaceActors()
+void ATile::PlaceActors(TSubclassOf<AActor> toSpawn, int minSpawn, int maxSpawn)
 {
-	FVector min(0, -200, 0);
+	FVector min(0, -2000, 0);
 	FVector max(4000, 2000, 0);
 	FBox bounds(min, max);
-	for (size_t i = 0; i < 20; i++)
+	int numberToSpawn = FMath::RandRange(minSpawn, maxSpawn);
+	for (size_t i = 0; i < numberToSpawn; i++)
 	{
 		FVector spawnPoint = FMath::RandPointInBox(bounds);
+		AActor* spawned = GetWorld()->SpawnActor<AActor>(toSpawn);
+		spawned->SetActorRelativeLocation(spawnPoint);
+		spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	}
 }
 
