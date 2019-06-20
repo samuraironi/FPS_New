@@ -27,5 +27,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	
-	
+private:
+	bool CastSphere(FVector location, float radius);
 };
