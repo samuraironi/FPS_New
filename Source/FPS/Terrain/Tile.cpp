@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Engine/World.h"
 #include "Tile.h"
+#include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -51,12 +50,12 @@ bool ATile::CastSphere(FVector location, float radius)
 		location,
 		location,
 		FQuat::Identity,
-		ECollisionChannel::ECC_Camera,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(radius)
 	);
 	FColor resultColor = hasHit ? FColor::Red : FColor::Green;
 
-	DrawDebugSphere(GetWorld(), location, radius, 100, resultColor, true, 100);
+	DrawDebugCapsule(GetWorld(), location, 0, radius,FQuat::Identity ,resultColor, true, 100);
 	return hasHit;
 }
 
