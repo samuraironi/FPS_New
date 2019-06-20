@@ -12,19 +12,20 @@ ATile::ATile()
 
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> toSpawn, int minSpawn, int maxSpawn)
+void ATile::PlaceActors(TSubclassOf<AActor> toSpawn, int minSpawn, int maxSpawn, float radius)
 {
-	FVector min(0, -2000, 0);
-	FVector max(4000, 2000, 0);
-	FBox bounds(min, max);
 	int numberToSpawn = FMath::RandRange(minSpawn, maxSpawn);
 	for (size_t i = 0; i < numberToSpawn; i++)
 	{
-		FVector spawnPoint = FMath::RandPointInBox(bounds);
-		AActor* spawned = GetWorld()->SpawnActor<AActor>(toSpawn);
-		spawned->SetActorRelativeLocation(spawnPoint);
-		spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		FVector spawnPoint;
+		bool found = FindEmptylocation(radius, spawnPoint);
+		if (found)
+		{
+			PlaceActor(toSpawn, spawnPoint);
+		}
 	}
+
+
 }
 
 // Called when the game starts or when spawned
@@ -32,7 +33,6 @@ void ATile::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CastSphere(GetActorLocation(), 300);
 }
 
 // Called every frame
@@ -42,20 +42,46 @@ void ATile::Tick(float DeltaTime)
 
 }
 
-bool ATile::CastSphere(FVector location, float radius)
+bool ATile::FindEmptylocation(float radius, FVector& outLocation)
+{
+	FVector min(0, -2000, 0);
+	FVector max(4000, 2000, 0);
+	FBox bounds(min, max);
+	const int MAX_ATTEMPTS = 100;
+	for (size_t i = 0; i < MAX_ATTEMPTS; i++)
+	{
+		FVector candidatePoint = FMath::RandPointInBox(bounds);
+		if (CanSpawnAtLocation(candidatePoint, radius))
+		{
+			outLocation = candidatePoint;
+			return true;
+		}
+	}
+	return false;
+}
+
+void ATile::PlaceActor(TSubclassOf<AActor> toSpawn, FVector spawnPoint)
+{
+	AActor* spawned = GetWorld()->SpawnActor<AActor>(toSpawn);
+	spawned->SetActorRelativeLocation(spawnPoint);
+	spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+}
+
+bool ATile::CanSpawnAtLocation(FVector location, float radius)
 {
 	FHitResult hitResult;
+	FVector globalLocation = ActorToWorld().TransformPosition(location);
 	bool hasHit = GetWorld()->SweepSingleByChannel(
 		hitResult,
-		location,
-		location,
+		globalLocation,
+		globalLocation,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(radius)
 	);
 	FColor resultColor = hasHit ? FColor::Red : FColor::Green;
 
-	DrawDebugCapsule(GetWorld(), location, 0, radius,FQuat::Identity ,resultColor, true, 100);
-	return hasHit;
+	DrawDebugCapsule(GetWorld(), location, 0, radius, FQuat::Identity ,resultColor, true, 100);
+	return !hasHit;
 }
 
