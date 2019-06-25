@@ -16,9 +16,16 @@ class FPS_API AInfiniteTerrainGameMode : public AFPSGameMode
 	
 	
 public:
+	AInfiniteTerrainGameMode();
+
 	UFUNCTION(BlueprintCallable, Category = "Bounds Pool")
 	void PopulateBoundsVolume();
 	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pool")
+	class UActorPool* _navMeshBoundVolumePool;
+
+
 private:
 	void AddToPool(class ANavMeshBoundsVolume* volumeToAdd);
 };

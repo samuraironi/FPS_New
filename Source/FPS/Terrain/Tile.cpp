@@ -13,6 +13,10 @@ ATile::ATile()
 
 }
 
+void ATile::SetPool(UActorPool * pool)
+{
+	_pool = pool;
+}
 
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
