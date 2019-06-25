@@ -17,6 +17,7 @@ AActor * UActorPool::Checkout()
 {
 	if (_pool.Num() == 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s] Checkout."), *GetName());
 		return nullptr;
 	}
 	return _pool.Pop();

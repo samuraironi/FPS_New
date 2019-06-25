@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Tile.h"
 #include "Engine/World.h"
+#include "AI/Navigation/NavigationSystem.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "ActorPool.h"
@@ -11,12 +12,15 @@ ATile::ATile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	NavigationBoundsOffset = FVector(2000, 0, 0);
+
 	MinExtent = FVector(0, -2000, 0);
 	MaxExtent = FVector(4000, 2000, 0);
 }
 
 void ATile::SetPool(UActorPool * pool)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Setting Pool %s"), *(this->GetName()), *(pool->GetName()));
 	_pool = pool;
 
 	PositionNavMeshBoundVolume();
@@ -24,14 +28,16 @@ void ATile::SetPool(UActorPool * pool)
 
 void ATile::PositionNavMeshBoundVolume()
 {
-	_navMeshBoundVolume = _pool->Checkout();
-	if (_navMeshBoundVolume == nullptr)
+	NavMeshBoundVolume = _pool->Checkout();
+	if (NavMeshBoundVolume == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%s] Not enough actors in pool"), *GetName());
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("[%s] Checked out: [%s]"), *GetName(), *_navMeshBoundVolume->GetName());
-	_navMeshBoundVolume->SetActorLocation(GetActorLocation());
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Checked out: [%s]"), *GetName(), *NavMeshBoundVolume->GetName());
+	NavMeshBoundVolume->SetActorLocation(GetActorLocation() + NavigationBoundsOffset);
+	auto navSystem = GetWorld()->GetNavigationSystem();
+	navSystem->Build();
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +51,7 @@ void ATile::BeginPlay()
 void ATile::EndPlay(const EEndPlayReason::Type endPlayReason)
 {
 	Super::EndPlay(endPlayReason);
-	_pool->Return(_navMeshBoundVolume);
+	_pool->Return(NavMeshBoundVolume);
 }
 
 // Called every frame

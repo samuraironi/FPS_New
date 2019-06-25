@@ -32,6 +32,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 	FVector MaxExtent;
+
+
+	UPROPERTY(EditDefaultsOnly,  Category = "Nawigation")
+	FVector NavigationBoundsOffset;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -46,7 +51,7 @@ private:
 	bool CanSpawnAtLocation(FVector location, float radius);
 
 	UActorPool* _pool;
-	AActor* _navMeshBoundVolume;
+	AActor* NavMeshBoundVolume;
 
 	void PositionNavMeshBoundVolume();
 };
