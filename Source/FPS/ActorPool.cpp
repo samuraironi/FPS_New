@@ -20,8 +20,19 @@ AActor * UActorPool::Checkout()
 
 void UActorPool::Return(AActor * actorToReturn)
 {
+	if (actorToReturn == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("returned no actor"));
+		return;
+	}
 }
 
 void UActorPool::Add(AActor * actorToAdd)
 {
+	if (actorToAdd == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("added no actor"));
+		return;
+	}
+	Return(actorToAdd);
 }

@@ -16,7 +16,7 @@ public:
 	// Sets default values for this component's properties
 	UActorPool();	
 	
-	class AActor*  Checkout();
+	class AActor* Checkout();
 
 	void Return(AActor* actorToReturn);
 

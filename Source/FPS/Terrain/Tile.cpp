@@ -3,7 +3,7 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
-
+#include "ActorPool.h"
 
 // Sets default values
 ATile::ATile()
@@ -16,6 +16,19 @@ ATile::ATile()
 void ATile::SetPool(UActorPool * pool)
 {
 	_pool = pool;
+
+	PositionNavMeshBoundVolume();
+}
+
+void ATile::PositionNavMeshBoundVolume()
+{
+	_navMeshBoundVolume = _pool->Checkout();
+	if (_navMeshBoundVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Not enough actors in pool"));
+		return;
+	}
+	_navMeshBoundVolume->SetActorLocation(GetActorLocation());
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +37,12 @@ void ATile::BeginPlay()
 	Super::BeginPlay();
 	
 	
+}
+
+void ATile::EndPlay(const EEndPlayReason::Type endPlayReason)
+{
+	Super::EndPlay(endPlayReason);
+	_pool->Return(_navMeshBoundVolume);
 }
 
 // Called every frame
