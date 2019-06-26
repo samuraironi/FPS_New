@@ -63,11 +63,30 @@ void ATile::Tick(float DeltaTime)
 
 void ATile::PlaceActors(TSubclassOf<AActor> toSpawn, int minSpawn, int maxSpawn, float radius, float minScale, float maxScale)
 {
-	TArray<FSpawnPosition> spawnPositions = RandomSpawnPositions(minSpawn, maxSpawn, radius, minScale, maxScale)
+	TArray<FSpawnPosition> spawnPositions = RandomSpawnPositions(minSpawn, maxSpawn, radius, minScale, maxScale);
 	for (FSpawnPosition spawnPosition : spawnPositions)
 	{
 		PlaceActor(toSpawn, spawnPosition);
 	}
+}
+
+void ATile::PlaceAIPawns(TSubclassOf<APawn> toSpawn, int minSpawn, int maxSpawn, float radius)
+{
+	TArray<FSpawnPosition> spawnPositions = RandomSpawnPositions(minSpawn, maxSpawn, radius, 1, 1);
+	for (FSpawnPosition spawnPosition : spawnPositions)
+	{
+		PlaceAIPawn(toSpawn, spawnPosition);
+	}
+}
+
+void ATile::PlaceAIPawn(TSubclassOf<APawn> toSpawn, FSpawnPosition spawnPosition)
+{
+	APawn* spawned = GetWorld()->SpawnActor<APawn>(toSpawn);
+	spawned->SetActorRelativeLocation(spawnPosition.Location);
+	spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	spawned->SetActorRotation(FRotator(0, spawnPosition.Rotation, 0));
+	spawned->SpawnDefaultController();
+	spawned->Tags.Add(FName("Enemy"));
 }
 
 TArray<FSpawnPosition> ATile::RandomSpawnPositions(int minSpawn, int maxSpawn, float radius, float minScale, float maxScale)
